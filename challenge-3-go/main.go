@@ -22,6 +22,7 @@ func appendMessages(msg_chan chan float64) {
 
 var topology []interface{}
 var recv []float64
+var microbuffer []float64
 
 func infinite_retry(body map[string]any, dest string, n *maelstrom.Node) {
 	chan_done := false
@@ -38,11 +39,31 @@ func infinite_retry(body map[string]any, dest string, n *maelstrom.Node) {
 	}
 }
 
+func push_buffer(n *maelstrom.Node) {
+	for {
+		time.Sleep(time.Second)
+		if len(microbuffer) == 0 {
+			continue
+		}
+		body := make(map[string]any)
+		body["type"] = "internal_broadcast"
+		body["message"] = microbuffer
+		microbuffer = nil
+		for _, v := range n.NodeIDs() { //Not efficient, just blasts to all nodes
+			if v == n.ID() {
+				continue
+			}
+			go infinite_retry(body, v, n)
+		}
+	}
+}
+
 func main() {
 	n := maelstrom.NewNode()
 	log.Println("Starting node...")
 	msg_chan := make(chan float64, 10000)
 	go appendMessages(msg_chan)
+	go push_buffer(n)
 	n.Handle("broadcast", func(msg maelstrom.Message) error {
 		// Unmarshal the message body as an loosely-typed map.
 		var body map[string]any
@@ -55,19 +76,11 @@ func main() {
 		value := body["message"].(float64)
 		msg_chan <- value
 		recv = append(recv, value)
-
-		// Update the message type to return back.
-		body["type"] = "internal_broadcast"
+		microbuffer = append(microbuffer, value)
 		resp["type"] = "broadcast_ok"
 		resp["msg_id"] = body["msg_id"]
+		// Update the message type to return back.
 		resply := n.Reply(msg, resp)
-		for _, v := range n.NodeIDs() { //Not efficient, just blasts to all nodes
-			if v == n.ID() {
-				continue
-			}
-			go infinite_retry(body, v, n)
-		}
-		// Echo the original message back with the updated message type.
 		return resply
 	})
 
@@ -80,8 +93,10 @@ func main() {
 			return err
 		}
 		log.Println(body)
-		value := body["message"].(float64)
-		msg_chan <- value
+		value := body["message"].([]interface{})
+		for _, v := range value {
+			msg_chan <- v.(float64)
+		}
 
 		// Update the message type to return back.
 		resp["type"] = "internal_broadcast_ok"
@@ -92,19 +107,29 @@ func main() {
 	n.Handle("read", func(msg maelstrom.Message) error {
 		// Unmarshal the message body as an loosely-typed map.
 		var body map[string]any
+
+		if len(microbuffer) > 0 {
+			resp := make(map[string]any)
+			resp["type"] = "internal_broadcast"
+			resp["message"] = microbuffer
+			for _, v := range n.NodeIDs() { //Not efficient, just blasts to all nodes
+				if v == n.ID() {
+					continue
+				}
+				go infinite_retry(resp, v, n)
+			}
+			microbuffer = nil
+		}
+
 		if err := json.Unmarshal(msg.Body, &body); err != nil {
 			log.Println(err)
 			return err
 		}
-		log.Println(body)
 
-		// Update the message type to return back.
 		body["type"] = "read_ok"
 		body["messages"] = messages
-
-		log.Println(body)
-		// Echo the original message back with the updated message type.
-		return n.Reply(msg, body)
+		resply := n.Reply(msg, body)
+		return resply
 	})
 
 	n.Handle("topology", func(msg maelstrom.Message) error {
