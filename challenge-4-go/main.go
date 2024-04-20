@@ -49,6 +49,13 @@ func main() {
 	kv = maelstrom.NewSeqKV(n)
 	local_gcounter = 0
 	log.Println("Starting node...")
+
+
+   //Shouldnt this be causing racy behaviour? 
+   //We are updating the gloabl counters based on local counters, even before we are
+   //sure if local counters are upto date. 
+   //I think its depending on local counter being updated before 1st read comes in and 
+   //global counter being updated before second read.
 	go update_global_kv_record(n)
 	n.Handle("add", func(msg maelstrom.Message) error {
 

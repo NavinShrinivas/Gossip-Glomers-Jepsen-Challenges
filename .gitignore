@@ -1,5 +1,23 @@
+# Ignoring binaries
 /challenge-1/target/
 /challenge-2/target/
-/challenge-3/target/
+/challenge-3abcd-go/target/
+/challenge-3e-go/target/
+/challenge-4-go/challenge-4
+/challenge-5a-g0/challenge-5
+/challenge-5b-go/challenge-5
+/challenge-5c-go/challenge-5
+
+# Ignoring results
+/challenge-1/store/
+/challenge-2/store/
+/challenge-3abcd-go/store/
+/challenge-3e-go/store/
+/challenge-4-go/store/
+/challenge-5a-go/store/
+/challenge-5b-go/store/
+/challenge-5c-go/store/
+
+
 /maelstrom
 /store
