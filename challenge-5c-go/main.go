@@ -5,15 +5,16 @@ import (
 	"context"
 	"encoding/json"
 	"log"
-	"strconv"
+	// "strconv"
 
 	maelstrom "github.com/jepsen-io/maelstrom/demo/go"
 )
 
-//There are no recency requirements so acknowledged send messages do not need to return in poll messages immediately.
-
 //We can avoid CAS if we simply handle all keys in a single node.
 //Using a good hash function, we can send all same keys to the same node
+//That is some optimisation that can help in 5C 
+
+// Note : there are not changes from 5B to 5C, I might come back to the in the end.
 
 var kv *maelstrom.KV
 var kv2 *maelstrom.KV
@@ -23,7 +24,7 @@ func main() {
 	kv = maelstrom.NewLinKV(n)
 	kv2 = maelstrom.NewSeqKV(n)
 	n.Handle("send", func(msg maelstrom.Message) error {
-		number_of_nodes := len(n.NodeIDs())
+		// number_of_nodes := len(n.NodeIDs())
 		var body map[string]any
 		var resp map[string]any = make(map[string]any)
 		if err := json.Unmarshal(msg.Body, &body); err != nil {
@@ -34,25 +35,25 @@ func main() {
 		key := body["key"].(string)
 		value := body["msg"].(float64)
 
-		//To find onwership :
-		vali, _ := strconv.Atoi(key)
-		key_ownership_node := int(vali % number_of_nodes)
-		if n.NodeIDs()[key_ownership_node] != n.ID() {
-			ret_msg, err := n.SyncRPC(context.Background(),n.NodeIDs()[key_ownership_node], msg.Body)
-			if err != nil {
-				log.Println(err)
-				return err
-			}
-			if err := json.Unmarshal(ret_msg.Body, &body); err != nil {
-				log.Println(err)
-				return err
-			}
-			resp["type"] = "send_ok"
-			resp["offset"] = body["offset"].(float64)
-			resply := n.Reply(msg, resp)
-			return resply
-
-		}
+		// //To find onwership :
+		// vali, _ := strconv.Atoi(key)
+		// key_ownership_node := int(vali % number_of_nodes)
+		// if n.NodeIDs()[key_ownership_node] != n.ID() {
+		// 	ret_msg, err := n.SyncRPC(context.Background(),n.NodeIDs()[key_ownership_node], msg.Body)
+		// 	if err != nil {
+		// 		log.Println(err)
+		// 		return err
+		// 	}
+		// 	if err := json.Unmarshal(ret_msg.Body, &body); err != nil {
+		// 		log.Println(err)
+		// 		return err
+		// 	}
+		// 	resp["type"] = "send_ok"
+		// 	resp["offset"] = body["offset"].(float64)
+		// 	resply := n.Reply(msg, resp)
+		// 	return resply
+		//
+		// }
 
 		//Loop from :
 		for {
@@ -61,7 +62,7 @@ func main() {
 				possible_future_log_arr := []float64{value}
 				//We need to use CAS here, unlike in challenge 4 as :
 				//Unlike grow only counter, we cannot just overwrite (add) previous value, we need to save it
-				err = kv.Write(context.Background(), key, possible_future_log_arr)
+				err = kv.CompareAndSwap(context.Background(), key, []float64{},possible_future_log_arr, true)
 				if err != nil {
 					continue
 				}
@@ -77,7 +78,7 @@ func main() {
 				possible_future_log_arr := append(current_log_arr, value)
 				//We need to use CAS here, unlike in challenge 4 as :
 				//Unlike grow only counter, we cannot just overwrite (add) previous value, we need to save it
-				err = kv.Write(context.Background(), key, possible_future_log_arr)
+				err = kv.CompareAndSwap(context.Background(), key, current_log_arr, possible_future_log_arr, true)
 				if err != nil {
 					continue //Re try
 				}
