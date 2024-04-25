@@ -8,6 +8,8 @@
 /challenge-5b-go/challenge-5
 /challenge-5c-go/challenge-5
 /challenge-6a-go/challenge-6
+/challenge-6b-go/challenge-6
+/challenge-6c-go/challenge-6
 
 # Ignoring results
 /challenge-1/store/
@@ -19,6 +21,8 @@
 /challenge-5b-go/store/
 /challenge-5c-go/store/
 /challenge-6a-go/store/
+/challenge-6b-go/store/
+/challenge-6c-go/store/
 
 
 /maelstrom
