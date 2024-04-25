@@ -1,5 +1,5 @@
 ## Overview : 
-This repo holds my solutions to the gossip glomers Challenges that has a series of challenges built using `maelstorm` sdk (go and rust). These are a bunch of introductory distributed system challenges that I think give a good first look into dist sys. I personally found them not so challenging.
+This repo holds my solutions to the gossip glomers Challenges that has a series of challenges built using `maelstrom` sdk (go and rust). These are a bunch of introductory distributed system challenges that I think give a good first look into dist sys. I personally found them not so challenging.
 
 ## Notes on Challenges : 
 
