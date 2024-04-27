@@ -41,15 +41,15 @@ Here we need to start thinking of recency and guarantees and race conditions.
 
 ### Challenge-5c Efficient Multi-Node Kafka:
 
-Here we need to start thinking as to which data resides in which KV!
+Here we need to start thinking as to which data resides in which KV! For this, I did not do anything different from 5b as there is no strict test for this challenge and I was stumped for ideas too. Do post your solutions somewhere if u get some simple ideas.
 
 ### Challenge-6a Single node KV:
 
-For a single node KV, try not to use a KV provided by Maelstrom. A local KV makes this challenge its worth.
+For a single node KV, try not to use a KV provided by Maelstrom. A local KV makes this challenge its worth. 
 
 ### Challenge-6b Multi Node KV Read Uncommitted:
 
-extension of challenge 6a, but now we move a multi-node replicated kV store with a rather weak gaurentee. `Read Uncommitted` is what is asked of us. In this gaurentee almost anything is allowed. They also want you to check against the partition for total availability.
+extension of challenge 6a, but now we move a multi-node replicated kV store with a rather weak gaurentee. `Read Uncommitted` is what is asked of us. In this guarantee, almost anything is allowed. They also want you to check against the partition for total availability.
 
 ### Challenge-6c Multi Node KV Read Committed:
 
