@@ -5,7 +5,7 @@ Link to these challenges (I hope they never take these down) : [Gossip Glomer Ch
 
 If for any reason these challenges were to be taken off of the internet, I have the challenges copied to the `readme.md` in each of the challenged folders, and if they were ever to take down the `maelstrom` binary, I have a version of the binary in this folder as well. 
 
-If they were to take down the maelstrom go SKD, guess what? I have a copy of that in here too xD. *All the tests for each of the challenges are part of readme.md in each challenge folder*
+If they were to take down the maelstrom go SKD, guess what? I have a copy of that in here too xD. **All the tests for each of the challenges are part of readme.md in each challenge folder**
 
 ## Notes on Challenges : 
 
