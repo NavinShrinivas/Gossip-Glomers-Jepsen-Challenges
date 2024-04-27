@@ -66,7 +66,6 @@ The solution is rather simple, the key is [BEWARE BEFORE OPENING, its worth work
   
 </details>
 
-test :
 
 <br /> <br /><br />
 --- 
